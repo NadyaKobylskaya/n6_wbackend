@@ -1,6 +1,7 @@
 <?php
+// Отправляем браузеру правильную кодировку
 header('Content-Type: text/html; charset=UTF-8');
-
+// Инициализируем переменные для подключения к базе данных.
   $user = 'u40986';
   $pass = '2343433';
   $db = new PDO('mysql:host=localhost;dbname=u40986', $user, $pass, array(PDO::ATTR_PERSISTENT => true));
@@ -14,14 +15,15 @@ header('Content-Type: text/html; charset=UTF-8');
     setcookie('pass', '', 100000);
     // Выводим сообщение пользователю.
     $messages[] = 'Спасибо, результаты сохранены.<br>';
+    //Если куки не пустая, то выводим сообщение
     if (!empty($_COOKIE['pass'])) {
       $messages[] = sprintf('Вы можете <a href="login.php">войти</a> с логином <strong>%s</strong>
         и паролем <strong>%s</strong> для изменения данных.',
-        strip_tags($_COOKIE['login']),
+        strip_tags($_COOKIE['login']), //удаляет html и php тэги
         strip_tags($_COOKIE['pass']));
     }
   }
-  
+  // Складываем признаки ошибок в массив.
   $errors = array();
   $errors['name'] = !empty($_COOKIE['name_error']);
   $errors['email'] = !empty($_COOKIE['email_error']);
@@ -31,7 +33,7 @@ header('Content-Type: text/html; charset=UTF-8');
   $errors['super'] = !empty($_COOKIE['super_error']);
   $errors['bio'] = !empty($_COOKIE['bio_error']);
   $errors['contr_check'] = !empty($_COOKIE['contr_check_error']);
-
+//проверяем на ошибки
   if ($errors['name']) {
     setcookie('name_error', '', 100000);
     $messages['name_message'] = '<div class="error">Заполните имя.<br>Поле может быть заполнено символами только русского или только английского алфавитов</div>';
@@ -64,8 +66,12 @@ header('Content-Type: text/html; charset=UTF-8');
     setcookie('contr_check_error', '', 100000);
     $messages['contr_check_message'] = '<div class="error">Вы не можете отправить форму, не ознакомившись с контрактом</div>';
   }
-
+    // Складываем предыдущие значения полей в массив, если есть.
+    // При этом санитизуем(удаляем неправильные или небезопасные символы 
+    //из пользовательского ввода, либо правильным образом формирует выходные данные) все данные для безопасного отображения в браузере.
   $values = array();
+     // Для этого используем тернарный оператор. Если кука пустая, присваиеваем
+    // значение по умолчанию или пустую строку. Иначе присваем значение этой куки.
   $values['name'] = empty($_COOKIE['name_value']) ? '' : $_COOKIE['name_value'];
   $values['email'] = empty($_COOKIE['email_value']) ? '' : $_COOKIE['email_value'];
   $values['year'] = empty($_COOKIE['year_value']) ? '' : $_COOKIE['year_value'];
@@ -217,6 +223,7 @@ if (empty($_POST['name'])) {
     header('Location: index.php');
     exit();
   }
+  //иначе удаляем неверно введенные данные
   else {
     setcookie('name_error', '', 100000);
     setcookie('email_error', '', 100000);
