@@ -1,7 +1,6 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="style_a.css">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
 	
 </head>
@@ -16,9 +15,9 @@
 // PHP хранит логин и пароль в суперглобальном массиве $_SERVER.
 // Подробнее см. стр. 26 и 99 в учебном пособии Веб-программирование и веб-сервисы.
 
-$db_user = 'u40986';   // Логин БД
-$db_pass = '2343433';
-$db = new PDO('mysql:host=localhost;dbname=u40986', $db_user, $db_pass, array(
+$db_user = 'u41035';   // Логин БД
+$db_pass = '1343433';
+$db = new PDO('mysql:host=localhost;dbname=u41035', $db_user, $db_pass, array(
     PDO::ATTR_PERSISTENT => true
 ));
 $login = isset($_SERVER['PHP_AUTH_USER']) ? $_SERVER['PHP_AUTH_USER'] : '';
@@ -28,20 +27,20 @@ $stmt = $db->prepare("SELECT * FROM admin WHERE login = ?");
       ));
 $admin_pass = $stmt->fetch();
 
-if (empty($_SERVER['PHP_AUTH_USER']) ||
-    empty($_SERVER['PHP_AUTH_PW']) ||
+if (empty($_SERVER['PHP_AUTH_USER']) || //PHP_AUTH_USER - логин
+    empty($_SERVER['PHP_AUTH_PW']) || //пароль
     $_SERVER['PHP_AUTH_USER'] != 'admin' ||
-    $_SERVER['PHP_AUTH_PW']!='admin'){
-      header('HTTP/1.1 401 Unanthorized');
-      header('WWW-Authenticate: Basic realm="My site"');
+    $_SERVER['PHP_AUTH_PW']!="admin"){
+      header('HTTP/1.1 401 Unanthorized'); //говорит что не авторизованы
+      header('WWW-Authenticate: Basic realm="My site"');//вызывает окно авторизации
       print('<h1>401 Требуется авторизация</h1>');
       exit();
 }
 
 print('Вы успешно авторизовались и видите защищенные паролем данные.<br>');
 
-function show_tables($db){
-  $sql = 'SELECT  application6.*, 
+function show_tables($db){ //создаем таблицы
+  $sql = 'SELECT  application6.*,
                     SuperDef.name as power,
                     users6.login
             FROM application6
@@ -52,15 +51,18 @@ function show_tables($db){
             INNER JOIN users6 
                 ON users6.id = application6.id;';
   ?>
+//строим тайбл
   <table class="table">
   <caption>users' data</caption> 
     <tr><th>id</th><th>name</th><th>e-mail</th><th>year</th><th>gender</th><th>kon</th><th>bio</th><th>superpower</th><th>login</th><th colspan="3">action</th></tr><!--ряд с ячейками заголовков-->
   <?php
+      //заполняем таблицу
 	  foreach ($db->query($sql, PDO::FETCH_ASSOC) as $row) {
       print('<tr>');
       foreach ($row as $v){
         print('<td>'.$v. '</td>');
       }
+          //доп столбец со ссылками
       print('<td colspan="2"> <a href="?act=edit_article&edit_id='.$row["id"].'">edit</a></td>   ');print('<td> <a href="?act=delete_article&delete_id='.$row["id"].'">delete</a></td>');
     } 
     print('</tr></table>');
@@ -323,4 +325,4 @@ else{
   }
   header('Location: admin.php');
 }
-
+//header('HTTP/1.1 401 Unanthorized');
